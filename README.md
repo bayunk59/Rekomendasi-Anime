@@ -3,40 +3,37 @@ Proyek Sistem Rekomendasi Pertama
 
 ## Domain Proyek
 
-Anime adalah sebuah 
-Cuaca menjadi salah satu pengaruh terbesar dalam aspek kehidupan makhluk hidup terutama manusia, mulai dari melakukan perencanaan aktivitas sehari-hari hingga pengambilan keputusan dalam sektor seperti pertanian, penerbangan, transportasi dan pariwisata. Cuaca yang tak menentu dapat membuat jadwal yang dibuat menjadi berantakan, salah satu solusi yang bisa dilakukan adalah mengklasifikasikan cuaca. Dengan mengklasifikasikan cuaca dapat dilihat anomali apa saja yang terjadi dan hasilnya dapat dipelajar untuk kebutuhan riset di kemudian hari.
+Anime adalah sebuah animasi khas yang berasal dari jepang, ini biasanya dicirikan melalui gambar-gambar berwarna-warni yang menampilkan tokoh dalam berbagai macam lokasi dan cerita. Anime sendiri telah berkembang pesat dalam beberapa dekade terakhir dan menjadi salah satu bentuk hiburan yang populer di seluruh dunia. Dengan banyaknya judul anime yang tersedia sekarang, peminat anime kadang mengalami kesulitan dalam menentukan judul yang sesuai dengan minat mereka. Hal ini dapat menyebabkan pemborosan waktu, terutama ketika banyaknya pilihan yang dapat mereka tonton.
 
-Klasifikasi cuaca adalah proses mengelompokkan cuaca berdasarkan karakteristik atau pola tertentu yang telah ada dalam data. Klasifikasi cuaca biasa digunakan untuk mengelompokkan data cuaca berdasarkan beberapa kondisi atau pola yang ada, ini bertujuan untuk menghasilkan informasi cuaca yang lebih mudah dipahami dan bisa digunakan dalam berbagai konteks.
+Sistem rekomendasi hadir sebagai salah satu solusi untuk mengatasi masalah ini. Dengan memanfaatkan algoritma dan analisis data yang telah ada, sistem rekomendasi dapat memberikan saran yang dibuat berdasarkan mminat setiap orang. Dalam konteks ini, sistem rekomendasi dapat menganalisis berbagai faktor seperti genre, rating, popularitas dan lain sebagainya untuk menyajikan rekomendasi yang relevan dan menarik.
 
-Berbeda dengan prediksi cuaca, klasifikasi cuaca bisa dikatakan lebih pasti karena didasarkan pada data yang sudah pernah terjadi. Hasil klasifikasi cuaca biasanya digunakan dalam riset iklim, analisis tren cuaca, serta pembuatan aplikasi yang membutuhkan pengenalan pola cuaca.
-
-Untuk melakukan klasifikasi cuaca dengan baik, dapat digunakan permodelan machine learning. Machine learning bisa mengklasifikasikan cuaca tersebut berdasarkan fitur-fitur yang sudah ada. Dalam machine learning sendiri terdapat banyak sekali algoritma untuk membuat permodelan klasifikasi. Beberapa permodelan yang bisa dipakai adalah K-Nearest Neighbor (KNN), Random Forest dan Boosting Algoritm. Dengan memanfaatkan berbagai data yang didapat dan permodelan machine learning diharapkan klasifikasi cuaca ini mendapatkan hasil yang diinginkan dan dapat bermanfaat di kemudian hari.
+Sistem rekomendasi yang akan dibuat juuga dapat membantu platform penyedia layanan agar dapat memberikan rekomendasi terbaik kepada setiap user, dengan begitu user dapat dengan mudah menemukan anime yang mereka ingin tonton sesuai prefernsi mereka. Tentu saja ini akan menaikkan viewer penonton pada suatu platform bahkan bisa berdampak positif bagi penyedia platform.
 
 ## Business Understanding
 
-Berdasarkan data yang diambil dari kaggle mengenai klasifikasi cuaca, terdapat banyak faktor yang yang mempegaruhi sebuah perubahan cuaca. Maka dari itu, dibutuhkannya pengembangan model machine learning untuk membantu dan menentukan faktor apa saja yang berpengaruh pada tipe-tipe cuaca tertentu.
+Berdasarkan data yang diambil dari kaggle mengenai database anime, terdapat beberapa faktor yang bisa digunakan sebagai rekomendasi seperti genre, rating dan jumlah member. Metode yang akan kita gunakan saat ini ada rekomendasi bebasis konten (conten-based filtering) yang akan merekomendasikan item yang mirip dengan item yang disukai pengguna di masa lalu dan yang akan menjadi faktor utamanya adalah genre dari anime yang pernah mereka tonton sebelumnya.
 
 ### Problem Statements
 
 Problem statements yang ingin dibahas adalah:
 
-1. Berdasarkan dataset yang digunakan, fitur-fitur apa saja yang membedakan tipe cuaca yang satu dengan yang lainnya?
-2. Bagaimana cara mendapatkan model terbaik untuk klasifikasi cuaca tersebut?
+1. Berdasarkan dataset yang digunakan, bagaimana membuat sistem rekomendasi yang dipersonalisasikan dengan teknik content-based filtering?
+2. Dengan data rating yang Anda miliki, bagaimana perusahaan dapat merekomendasikan restoran lain yang mungkin disukai dan belum pernah dikunjungi oleh pengguna? 
 
 ### Goals
 
 Goals/tujuan dari poyek ini adalah:
 
-1. Melakukan eksplorasi pada semua fitur untuk menentukan fitur mana saja yang memiliki pengaruh besar atau korelasi tertinggi dengan tipe cuaca tersebut.
-2. Melakukan proses training terhadap beberapa model yang digunakan dalam proyek ini.
+1. Menghasilkan sejumlah rekomendasi restoran yang dipersonalisasi untuk pengguna dengan teknik content-based filtering.
+2. Menghasilkan sejumlah rekomendasi restoran yang sesuai dengan preferensi pengguna dan belum pernah dikunjungi sebelumnya dengan teknik collaborative filtering.
 
 ### Solution statements
 
 Beberapa solusi yang akan coba terapkan adalah:
 
-1. Melakukan eksplorasi fitur menggunakan analisis univariat dan multivariat untuk menemukan hubungan antar fitur baik yang data numerik maupun data kategorikal.
-2. Untuk mendapatkan data yang bersih sebelum di buat permodelan. Dilakukan preparation data yang terdiri dari Menghapus outlier, Menghapus fitur dengan korelasi yang rendah, Encoding Fitur Kategori, Train-Test-Spit dan Standarisasi.
-3. Permodelan akan dilakukan dengan 3 algoritma model, yaitu `K-Nearest Neighbors (KNN)`, `Random Forest (RF)` dan `Boosting Algorithm` lalu akan dipilih model terbaik berdasarkan nilai akurasinya.
+1. Melakukan eksplorasi fitur seperti cek duplikasi data, cek missing variabel di tiap data
+2. Untuk mendapatkan data yang bersih sebelum di buat permodelan. Dilakukan preparation data yang terdiri dari Menghapus missing value, Menghapus rating user yang bernilai -1, Encoding Fitur Kategori, Train-Test-Spit dan Standarisasi.
+3. Permodelan akan dilakukan dengan 2 metode yaitu.
 
 ## Data Understanding
 
