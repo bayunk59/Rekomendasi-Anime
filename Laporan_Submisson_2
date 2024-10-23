@@ -176,14 +176,49 @@ berdasarkan data yang telah digabung, jumlah data menjadi 6.337.146 baris dengan
 
 ### Mengatasi duplicate data pada fitur `name`
 
-Cek data duplicate pada fitur `name` agar tidak ada nama anime yang sama, setelahnya hapus data yang sama
+Cek data duplicate pada fitur `name` agar tidak ada nama anime yang sama, setelahnya hapus data yang sama. 
+Setelah duplicate data dihapus, lalu kita masukkan ke dalam data baru bernama `preparation`
 ```
-df.name.value_counts()
+preparation = df.drop_duplicates('name')
 ```
 
-Setelah dihapus, jumlah baris `df` menjadi 9892 baris saja.
+Setelah berhasil dihapus, jumlah baris `preparation` menjadi 9892 baris saja.
 
 ### Membuat dictionary pada fitur `anime_id`, `name`, dan `genre`
+
+Selanjutnya, kita perlu melakukan konversi data series menjadi list. Dalam hal ini, kita menggunakan fungsi tolist() dari library numpy.
+```
+anime_id = preparation['anime_id'].tolist()
+name = preparation['name'].tolist()
+genre = preparation['genre'].tolist()
+```
+
+Tahap berikutnya, kita akan membuat dictionary untuk menentukan pasangan key-value pada data anime_id, name, dan genre yang telah kita siapkan sebelumnya dan dimasukkan dalam dataset baru bernama `df_new`.
+```
+df_new = pd.DataFrame({
+    'anime_id': anime_id,
+    'name': name,
+    'genre': genre
+})
+df_new
+```
+
+output:
+
+| anime_id | name                                   | genre                                              |
+|----------|----------------------------------------|----------------------------------------------------|
+| 32281    | Kimi no Na wa.                         | Drama, Romance, School, Supernatural               |
+| 5114     | Fullmetal Alchemist: Brotherhood        | Action, Adventure, Drama, Fantasy, Magic, Military |
+| 28977    | Gintama°                               | Action, Comedy, Historical, Parody, Samurai, Sci-Fi|
+| 9253     | Steins;Gate                            | Sci-Fi, Thriller                                   |
+| 9969     | Gintama'                               | Action, Comedy, Historical, Parody, Samurai, Sci-Fi|
+| 5541     | The Satisfaction                       | Hentai                                             |
+| 9316     | Toushindai My Lover: Minami tai Mecha-Minami | Hentai                                          |
+| 5543     | Under World                            | Hentai                                             |
+| 5621     | Violence Gekiga David no Hoshi         | Hentai                                             |
+| 6133     | Violence Gekiga Shin David no Hoshi: Inma Densetsu | Hentai                                         |
+
+Data kini telah siap untuk dimasukkan ke dalam pemodelan dengan jumlah 9.892 baris dan 3 kolom.
 
 
 ## Modeling
