@@ -99,204 +99,92 @@ genre:  ['Drama, Romance, School, Supernatural'
   - `type`: 25 data
   - `rating`: 230 data
 
+Selanjutnya, tahapan yang akan saya lakukan pada variabel `rating` adalah sebagai berikut:
+
+1. Membuat dataset bernama `ratings`, lalu menampilkannya
+
+| user_id | anime_id | rating |
+|---------|----------|--------|
+| 1       | 20       | -1     |
+| 1       | 24       | -1     |
+| 1       | 79       | -1     |
+| 1       | 226      | -1     |
+| 1       | 241      | -1     |
+
+2. cek data `ratings`
+
+| Column    | Dtype   |
+|-----------|---------|
+| user_id   | int64   |
+| anime_id  | int64   |
+| rating    | int64   |
+
+berdasarkan data tersebut terdapat 7.813.737 baris dengan 3 kolom.
+
+3. cek missing value, berdasarkan hasil pengecekan missing value tidak terdapat data yang memiliki missing value
+
+4. cek jumlah pada fitur `rating` yang memiliki nilai -1
+```
+ratings[ratings.rating == -1].shape
+```
+
+berdasarkan pada outputnya, didapatkan 1.476.495 baris yang memiliki nilai -1, ini menandakan banyak sekali user yang hanya menonton tanpa memberikan penilaian.
 
 ## Data Preparation
 
-Data preparation merupakan tahapan penting dalam proses pengembangan model machine learning. Ini adalah tahapan dilakukannya proses transformasi pada data sehingga menjadi bentuk yang cocok untuk proses pemodelan. Dalam data preparation akan dilakukan 3 tahapan, yakni Encoding Fiitur Kategori, Train-Test-Split dan Standarisasi.
+Data preparation merupakan tahapan penting dalam proses pengembangan model machine learning. Ini adalah tahapan dilakukannya proses transformasi pada data sehingga menjadi bentuk yang cocok untuk proses pemodelan. Dalam data preparation akan dilakukan 3 tahapan, yakni Menghapus missing value, Menghapus rating yang bernilai -1, Menggabungkan data `anime` dan `ratings`, Mengatasi duplicate data pada fitur `name`, dan yang terakhir Membuat dictionary pada fitur `anime_id`, `name`, dan `genre`.
 
-### Menangani Outlier
+### Menghapus missing value
 
-Outlier adalah titik data yang secara signifikan berada di sebgaian data dalam kumpulan data. Outlier ini bisa muncul karena banyak faktor salah satunya adalah kesalahan pengamatan.
-
-- Menampilkan data outlier
-
-  ```
-  for column in cuaca.select_dtypes(include=np.number).columns:
-  plt.figure(figsize=(8, 6))
-  sns.boxplot(x=cuaca[column])
-  plt.title(f'Boxplot of {column}')
-  plt.show()
-  ```
-
-  output:
-
-  ![outlier1](https://github.com/user-attachments/assets/233ce168-9edd-4823-b346-9c895d9435b4)
-  ![outlier3](https://github.com/user-attachments/assets/1e0c1417-06d9-47eb-bc20-9cb80bc10512)
-  ![outlier5](https://github.com/user-attachments/assets/f7d3f274-a220-45d8-80ba-39b330c48cdd)
-  ![outlier7](https://github.com/user-attachments/assets/6bb6db3f-88aa-4cbd-a4e3-85db348acab0)
-
-  berdasarkan boxplot tersebut, ada 4 fitur yang memiliki outlier yakni fitur `Temperature`, `Wind           Speed`, `Athmospheric Pressure`, dan `Visibility (km)`
-
-- Outlier pada 4 fitur tersebut perlu dihapus untuk mendapatkan model yang bagus
-
-  ```
-  numeric_cuaca = cuaca.select_dtypes(include=np.number)
-
-  Q1 = numeric_cuaca.quantile(0.25)
-  Q3 = numeric_cuaca.quantile(0.75)
-  IQR = Q3 - Q1
-  lower_bound = Q1 - 1.5 * IQR
-  upper_bound = Q3 + 1.5 * IQR
-
-  cuaca = cuaca[~((numeric_cuaca < lower_bound) | (numeric_cuaca > upper_bound)).any(axis=1)]
-  ```
-
-  Outlier telah berhasil dihapus.
-
-- Menampilkan data terbaru setelah outliers dihapus
-
-  ```
-  cuaca.shape
-  ```
-
-  output:
-  `(11689, 11)`
-
-  Jumlah data terbaru sekarang adalah 11689 data
-
-### Mengubah Type Data
-
-Pada bagian ini, semua data kategorik akan diubah menjadi data numerik untuk mempermudah permodelan dan menentukan nilai uji korelasi antar fitur.
-
-- Mengubah data
-
-  ```
-  le = LabelEncoder()
-  cuaca['Cloud Cover'] = le.fit_transform(cuaca['Cloud Cover'])
-  cuaca['Location'] = le.fit_transform(cuaca['Location'])
-  cuaca['Season'] = le.fit_transform(cuaca['Season'])
-  cuaca['Weather Type'] = le.fit_transform(cuaca['Weather Type'])
-  cuaca.head()
-  ```
-
-  |     | Temperature | Humidity | Wind Speed | Precipitation (%) | Cloud Cover | Atmospheric Pressure | UV Index | Season | Visibility (km) | Location | Weather Type |
-  | --- | ----------- | -------- | ---------- | ----------------- | ----------- | -------------------- | -------- | ------ | --------------- | -------- | ------------ |
-  | 0   | 14.0        | 73       | 9.5        | 82.0              | 3           | 1010.82              | 2        | 3      | 3.5             | 1        | 1            |
-  | 1   | 39.0        | 96       | 8.5        | 71.0              | 3           | 1011.43              | 7        | 1      | 10.0            | 1        | 0            |
-  | 2   | 30.0        | 64       | 7.0        | 16.0              | 0           | 1018.72              | 5        | 1      | 5.5             | 2        | 3            |
-  | 3   | 38.0        | 83       | 1.5        | 82.0              | 0           | 1026.25              | 7        | 1      | 1.0             | 0        | 3            |
-  | 4   | 27.0        | 74       | 17.0       | 66.0              | 2           | 990.67               | 1        | 3      | 2.5             | 2        | 1            |
-
-data kategorik sudah berhasil diubah menjadi data numerik
-
-- Melakukan uji korelasi
-
-  ```
-   # Mengetahui skor korelasi
-   plt.figure(figsize=(10, 8))
-   correlation_matrix = cuaca.corr().round(2)
-
-   # Untuk menge-print nilai di dalam kotak, gunakan parameter anot=True
-   sns.heatmap(data=correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5, )
-   plt.title("Correlation Matrix untuk Fitur Numerik ", size=20)
-   plt.tight_layout()
-  ```
-
-  output:
-
-  ![korelasi](https://github.com/user-attachments/assets/901da1a1-4c83-409a-a41e-2478dd19e511)
-
-Berdasarkan nilai korelasi di atas `Temperature`, `Visibilty (km)`, dan `Location` adalah fitur yang mempunyai nilai korelasi paling kecil dengan target `Weather Type` dan akan di hapus
-
-### Hapus Kolom dengan Korelasi Terendah
-
-bagian ini adalah proses penghapusan fitur-fitur yang memiliki korelasi rendah terhadap variabel target dari dataset. Langkah ini diambil berdasarkan asumsi bahwa fitur dengan korelasi rendah tidak memberikan kontribusi signifikan terhadap prediksi yang dibuat oleh model.
-
+Setelah di cek, hanya beberapa fitur yang memiliki missing value seperti fitur `genre`, `type` dan `rating`. Langsung saja kita hapus 3 fitur tersebut
 ```
-cuaca.drop(['Temperature', 'Visibility (km)', 'Location'], inplace=True, axis=1)
-cuaca.head()
+anime.dropna(subset=['genre', 'type', 'rating'], inplace=True)
 ```
 
-output:
+Missing value telah berhasil di hapus.
 
-|     | Humidity | Wind Speed | Precipitation (%) | Cloud Cover | Atmospheric Pressure | UV Index | Season | Weather Type |
-| --- | -------- | ---------- | ----------------- | ----------- | -------------------- | -------- | ------ | ------------ |
-| 0   | 73       | 9.5        | 82.0              | 3           | 1010.82              | 2        | 3      | 1            |
-| 1   | 96       | 8.5        | 71.0              | 3           | 1011.43              | 7        | 1      | 0            |
-| 2   | 64       | 7.0        | 16.0              | 0           | 1018.72              | 5        | 1      | 3            |
-| 3   | 83       | 1.5        | 82.0              | 0           | 1026.25              | 7        | 1      | 3            |
-| 4   | 74       | 17.0       | 66.0              | 2           | 990.67               | 1        | 3      | 1            |
+### Menghapus rating yang bernilai -1
 
-Penghapusan fitur `Temperature` ,`Visibilty (km)`, `Location` karena memiliki nilai korelasi yang rendah. Berdasarkan data terbaru, tersisa 8 kolom
-
-### Train-Test-Split
-
-Train-Test-Split adalah metode untuk membagi dataset menjadi data latih (train) dan data uji (test). Biasanya data akan dibagi dengan proporsi tertentu. Dalam kasus ini saya akan membagi data menjadi 90:10 dimana 90% untuk training dan 10% untuk testing
-
+Nilai -1 pada fitur `rating` tidak akan berpengaruh karena tidak menggambarkan apapun, nilai -1 ini akan dihapuskan saja.
 ```
-X = cuaca.drop(['Weather Type'],axis =1)
-y = cuaca['Weather Type']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.1, random_state = 123)
+ratings = ratings[ratings.rating != -1]
 ```
 
-Berdasarkan output diatas kita telah sukses melakukan proses Train-Test-Split, terlihat bahwa:
+Setelah nilai -1 dihapus, juumlah data pada variabel `ratings` menjadi 6.337.241 baris.
 
-- Dataset train memiliki 10520 data
-- Dataset test memiliki 1169 data
+### Menggabungkan data `anime` dan `ratings`
 
-### Standarisasi
-
-Standardisasi adalah teknik transformasi yang paling umum digunakan dalam tahap persiapan pemodelan. Untuk fitur numerik, kita tidak akan melakukan transformasi dengan one-hot-encoding seperti pada fitur kategori. Kita akan menggunakan teknik StandarScaler dari library Scikitlearn.
-
-StandardScaler melakukan proses standarisasi fitur dengan mengurangkan mean (nilai rata-rata) kemudian membaginya dengan standar deviasi untuk menggeser distribusi. StandardScaler menghasilkan distribusi dengan standar deviasi sama dengan 1 dan mean sama dengan 0. Sekitar 68% dari nilai akan berada di antara -1 dan 1.
-
-Pada kasus ini kita hanya akan melakukan standarisai pada data latih dan data uji.
-
-1. Standarisasi pada data latih
+Data akan `anime` dan `ratings` akan digabungkan dengan `merge` pada fitur `anime_id`
 
 ```
-scaler = StandardScaler()
-X_train[:] = scaler.fit_transform(X_train[:])
-X_train.head()
+df = pd.merge(anime, ratings, on='anime_id', how='inner')
 ```
 
-Mengecek nilai mean dan standar deviasi setelah proses standarisasi
+lalu tampilkan data gabungan dengan nama `df`
 
+| anime_id | name           | genre                                 | type  | episodes | rating_x | members | user_id | rating_y |
+|----------|----------------|---------------------------------------|-------|----------|----------|---------|---------|----------|
+| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 99      | 5        |
+| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 152     | 10       |
+| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 244     | 10       |
+| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 271     | 10       |
+| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 322     | 10       |
+
+berdasarkan data yang telah digabung, jumlah data menjadi 6.337.146 baris dengan 9 kolom. ada 2 fitur yang memiliki nama yang sama dan diubah menjadi:
+- `rating_x`: berasal dari fitur `rating` di variabel `anime` berisi nilai rating keseluruhan
+- `rating_y`: berasal dari fitur `rating` di variabel `ratings` berisi nilai rating yang diberikan user
+
+### Mengatasi duplicate data pada fitur `name`
+
+Cek data duplicate pada fitur `name` agar tidak ada nama anime yang sama, setelahnya hapus data yang sama
 ```
-X_train[numerical_features].describe().round(4)
-```
-
-output:
-
-|       | Humidity   | Wind Speed | Precipitation (%) | Cloud Cover | Atmospheric Pressure | UV Index   | Season     |
-| ----- | ---------- | ---------- | ----------------- | ----------- | -------------------- | ---------- | ---------- |
-| count | 10520.0000 | 10520.0000 | 10520.0000        | 10520.0000  | 10520.0000           | 10520.0000 | 10520.0000 |
-| mean  | 0.0000     | -0.0000    | -0.0000           | -0.0000     | -0.0000              | 0.0000     | 0.0000     |
-| std   | 1.0000     | 1.0000     | 1.0000            | 1.0000      | 1.0000               | 1.0000     | 1.0000     |
-| min   | -2.5471    | -1.6399    | -1.6189           | -1.9194     | -3.3554              | -1.0061    | -1.6132    |
-| 25%   | -0.5379    | -0.7509    | -1.0579           | 0.0147      | -0.8084              | -0.7287    | -0.7533    |
-| 50%   | 0.0288     | -0.1287    | 0.1263            | 0.0147      | 0.1312               | -0.4512    | 0.1067     |
-| 75%   | 0.7501     | 0.7602     | 0.9054            | 0.9817      | 0.7751               | 0.6585     | 0.9666     |
-| max   | 2.0380     | 2.9825     | 1.7780            | 0.9817      | 3.3214               | 2.8781     | 0.9666     |
-
-2. Standarisasi pada data uji
-
-```
-scaler = StandardScaler()
-X_test[:] = scaler.fit_transform(X_test[:])
-X_test.head()
+df.name.value_counts()
 ```
 
-Mengecek nilai mean dan standar deviasi setelah proses standarisasi
+Setelah dihapus, jumlah baris `df` menjadi 9892 baris saja.
 
-```
-X_test.describe().round(4)
-```
+### Membuat dictionary pada fitur `anime_id`, `name`, dan `genre`
 
-output:
-
-|       | Humidity  | Wind Speed | Precipitation (%) | Cloud Cover | Atmospheric Pressure | UV Index  | Season    |
-| ----- | --------- | ---------- | ----------------- | ----------- | -------------------- | --------- | --------- |
-| count | 1169.0000 | 1169.0000  | 1169.0000         | 1169.0000   | 1169.0000            | 1169.0000 | 1169.0000 |
-| mean  | -0.0000   | 0.0000     | -0.0000           | 0.0000      | 0.0000               | -0.0000   | 0.0000    |
-| std   | 1.0004    | 1.0004     | 1.0004            | 1.0004      | 1.0004               | 1.0004    | 1.0004    |
-| min   | -2.5762   | -1.6572    | -1.6548           | -1.9693     | -3.1622              | -0.9804   | -1.6304   |
-| 25%   | -0.5187   | -0.7520    | -1.0564           | -0.0059     | -0.7894              | -0.7000   | -0.7684   |
-| 50%   | 0.0471    | -0.1183    | 0.1089            | -0.0059     | 0.0988               | -0.4197   | 0.0936    |
-| 75%   | 0.7672    | 0.7869     | 0.8648            | 0.9758      | 0.7765               | 0.4214    | 0.9557    |
-| max   | 2.0017    | 2.8689     | 1.7781            | 0.9758      | 3.2476               | 2.9444    | 0.9557    |
-
-Seperti yang disebutkan sebelumnya, proses ini akan mengubah nilai rata-rata (mean) menjadi 0 dan standar deviasi menjadi 1.
 
 ## Modeling
 
