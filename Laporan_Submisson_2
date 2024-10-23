@@ -38,206 +38,67 @@ Beberapa solusi yang akan coba terapkan adalah:
 
 ## Data Understanding
 
-Data yang saya gunakan berasal dari Kaggle dengan judul Anime Recommendations Database [anime](https://www.kaggle.com/datasets/CooperUnion/anime-recommendations-database), Data tersebut berisi 2 file dengan . Berikut adalah detail masing-masing kolomnya:
+Data yang saya gunakan berasal dari Kaggle dengan judul Anime Recommendations Database [anime](https://www.kaggle.com/datasets/CooperUnion/anime-recommendations-database), Data tersebut berisi 2 file dengan rincian sebagai berikut
+1. file `anime`
+  - `anime_id`: Id unik untuk judul anime
+  - `name`: Nama anime
+  - `genre`: Genre anime
+  - `type`: Tipe seperti Movie, TV, OVA, dll
+  - `episodes`: Jumlah episode
+  - `rating`: rating untuk anime
+  - `members`: jumlah anggota komunitas anime tersebut
 
-### Variabel-variabel pada dataset adalah sebagai berikut:
+2. file `rating`
+  - `user_id`: Id user.
+  - `anime_id`: id anime.
+  - `rating`: Rating dari user (jika bernilai -1 berarti user hanya menonton dan tidak memberi rating).
 
-- `Temperature` (numeric) : Temperatur suhu dalam celcius
-- `Humidity` (numeric) : Presentase Kelembaban
-- `Wind Speed` (numeric) : Kecepatan angin dalam kilometer/jam
-- `Precipitation (%)` (numeric) : Presentase curah hujan
-- `Cloud Cover` (categorical) : Deskripsi tutupan awan yang berisi clear, cloudy, overcast dan party cloudy
-- `Atmospheric Pressure` (numeric) : Tekanan atmosfer dalam hPa
-- `UV index` (numeric) : Indeks UX yang menunjukkan kekuatan radiasi UV
-- `Season` (categorical) : Jenis musim mulai dari Autumn, Spring, Summer dan Winter
-- `Visibility (km)` (numeric) : Jarak pandang dalam km
-- `Location` (categorical) : Lokasi dimana data di ambil seperti coastal, inland dan muntain
-- `Weather Type` (categorical) : Jenis cuaca yang berisi Cloudy, Rainy, Snowy dan Sunny (Target Klasifikasi)
+Tahapan yang akan saya lakukan pada variabel `anime` adalah sebagai berikut:
 
-Tahapan yang akan saya lakukan adalah:
+1. Membuat dataset bernama `anime`, lalu menampilkannya
 
-### Exploratory Data Analysis
+| anime_id | name                          | genre                                               | type | episodes | rating | members  |
+|----------|-------------------------------|-----------------------------------------------------|------|----------|--------|----------|
+| 32281    | Kimi no Na wa.                | Drama, Romance, School, Supernatural                | Movie| 1        | 9.37   | 200630   |
+| 5114     | Fullmetal Alchemist: Brotherhood | Action, Adventure, Drama, Fantasy, Magic, Military | TV   | 64       | 9.26   | 793665   |
+| 28977    | Gintama°                      | Action, Comedy, Historical, Parody, Samurai, Sci-Fi| TV   | 51       | 9.25   | 114262   |
+| 9253     | Steins;Gate                   | Sci-Fi, Thriller                                    | TV   | 24       | 9.17   | 673572   |
+| 9969     | Gintama'                      | Action, Comedy, Historical, Parody, Samurai, Sci-Fi| TV   | 51       | 9.16   | 151266   |
 
-Exploratory data analysis atau sering disingkat EDA merupakan proses investigasi awal pada data untuk menganalisis karakteristik, menemukan pola, anomali, dan memeriksa asumsi pada data. Teknik ini biasanya menggunakan bantuan statistik dan representasi grafis atau visualisasi.
+2. cek data `anime`
 
-Berikut adalah tahapan EDA yang dilakukan
+| Column     | Non-Null Count | Dtype   |
+|------------|----------------|---------|
+| anime_id   | 12,294         | int64   |
+| name       | 12,294         | object  |
+| genre      | 12,232         | object  |
+| type       | 12,269         | object  |
+| episodes   | 12,294         | object  |
+| rating     | 12,064         | float64 |
+| members    | 12,294         | int64   |
 
-- cek nilai duplikat pada data
+berdasarkan data tersebut terdapat 12.294 baris dengan 7 kolom.
 
+3. Cek jumlah genre dan apa saja genrenya
 ```
-duplicate_rows = cuaca[cuaca.duplicated()]
-print("Jumlah baris duplikat:", duplicate_rows.shape[0])
-```
-
-Output: Tidak terdapat baris duplikat
-
-- cek missing value pada data
-
-```
-print(cuaca.isnull().sum())
-```
-
-output:
-
-```
-Temperature             0
-Humidity                0
-Wind Speed              0
-Precipitation (%)       0
-Cloud Cover             0
-Atmospheric Pressure    0
-UV Index                0
-Season                  0
-Visibility (km)         0
-Location                0
-Weather Type            0
-dtype: int64
+print('Banyak genre anime: ', len(anime.genre.unique()))
+print('genre: ', anime.genre.unique())
 ```
 
-Tidak terdapat missing value
-
-### Univariate Analysis
-
-Univariate Analysis adalah jenis analisis data yang memeriksa satu variabel saja. Tujuannya uuntuk menggambarkan data dan menemukan pola distribusi data
-
-Sebelum mulai analysis data akan dibagi menjadi 2 bagian, yakni `numerical_fitur` untuk data numerik dan `categorical_features` untuk data kategorik
-
+ouput:
 ```
-numerical_features = ['Temperature', 'Humidity', 'Wind Speed', 'Precipitation (%)', 'Atmospheric Pressure', 'UV Index', 'Visibility (km)', 'Weather Type']
-categorical_features = ['Cloud Cover', 'Season', 'Location']
+Banyak genre anime:  3265
+genre:  ['Drama, Romance, School, Supernatural'
+ 'Action, Adventure, Drama, Fantasy, Magic, Military, Shounen'
+ 'Action, Comedy, Historical, Parody, Samurai, Sci-Fi, Shounen' ...
+ 'Hentai, Sports' 'Drama, Romance, School, Yuri' 'Hentai, Slice of Life']
 ```
 
-data telah terbagi menjadi numerical_features untuk data numerik dan categorical_features untuk data kategorik
+4. Terahir cek missing value, berdasarkan hasil pengecekan missing value terdapat beberapa data yang memiliki missing value dengan rincian sebagai berikut:
+  - `genre`: 62 data
+  - `type`: 25 data
+  - `rating`: 230 data
 
-#### Categorical Features
-
-Menampilkan data fitur dalam bentuk grafik
-
-```
-feature = categorical_features[2]
-count = cuaca[feature].value_counts()
-percent = 100*cuaca[feature].value_counts(normalize=True)
-df = pd.DataFrame({'jumlah sampel':count, 'persentase':percent.round(1)})
-print(df)
-count.plot(kind='bar', title=feature);
-```
-
-output:
-
-- Fitur CLoud Cover
-
-  ![uni1](https://github.com/user-attachments/assets/eb54bde9-018c-4812-bd29-512a7e631bd7)
-
-  Berdasarkan grafik pada fitur `Cloud Cover` di atas:
-
-  - `overcast` memiliki 6090 data
-  - `party cloud` memiliki 4560 data
-  - `clear` memiliki 2139 data
-  - `cloudy` memiliki 411 data
-
-- Fitur Season
-
-  ![uni2](https://github.com/user-attachments/assets/89a79189-0ca8-4c7a-aa51-5ff1c5ce3347)
-
-  Berdasarkan grafik pada fitur `Season` di atas:
-
-  - `winter` memiliki 5610 data
-  - `Spring` memiliki 2598 data
-  - `Autumn` memiliki 2500 data
-  - `Summer` memiliki 2492 data
-  -
-
-- Fitur Location
-
-  ![uni3](https://github.com/user-attachments/assets/8c64caaf-f523-4d1a-9b46-f8e3d156f937)
-
-  Berdasarkan grafik pada fitur `Location` di atas:
-
-  - `inland` memiliki 4816 data
-  - `mountain` memiliki 4813 data
-  - `coastal` memiliki 3571 data
-
-- Fitur Weather Type
-
-  ![uni4](https://github.com/user-attachments/assets/54c538c7-c9e4-4724-9716-01aa95a835d5)
-
-  Berdasarkan grafik pada fitur `Weather Type` di atas, nilai pada kolom ini terlihat seimbang dengan rincian sebagai berikut:
-
-- `Rainy` memiliki 3300 data
-- `Cluody` memiliki 3300 data
-- `Sunny` memiliki 3300 data
-- `Snowy` memiliki 3300 data
-
-#### Numerical Features
-
-Menampilkan data numerik dalam bentuk grafik
-
-![uni numerical](https://github.com/user-attachments/assets/86aecae9-6efc-4857-998e-95d1963c7072)
-
-Berdasarkan grafik diatas, hampir semmua kolom skewnessnya mengarah ke kiri kecuali `Humidity`, `Precipitaion (%)` dan `Atmospheric Pressure`.
-
-### Multivariate Analysis
-
-Multivariate Analysis menunjukkan hubungan antara dua atau lebih variabel pada data. Multivariate Analysis yang menunjukkan hubungan antara dua variabel biasa disebut sebagai bivariate Analysis. Selanjutnya, akan dilakukan analisis data pada fitur kategori dan numerik.
-
-#### Categorical Features
-
-Menampilkan hubungan fitur kategori dengan target `Weather Type`
-
-```
-for feature in categorical_features[:-1]:
-  plt.figure(figsize=(10, 6))
-  sns.countplot(x=feature, hue='Weather Type', data=cuaca)
-  plt.title(f'Hubungan {feature} dengan Weather Type')
-  plt.xlabel(feature)
-  plt.ylabel('Jumlah Data')
-  plt.legend(title='Weather Type')
-  plt.show()
-```
-
-output:
-
-- Fitur `Cloud Cover` dengan `Weather Type`
-  ![multi 1](https://github.com/user-attachments/assets/87fc3e98-d64e-40e9-9e40-63b7ac6489c9)
-
-- Fitur `Season` dengan `Weather Type`
-  ![multi 2](https://github.com/user-attachments/assets/e5ddf0dc-65e4-4e3d-8855-658535b1614d)
-
-- Fitur `Location` dengan `Weather Type`
-  ![multi 3](https://github.com/user-attachments/assets/f6a32fd5-234f-4ae4-93f7-0550e2c9b371)
-
-Berdasarkan grafik di atas didapatn:
-
-- Pada Fitur `Cloud Cover`
-
-1. Pada `party cloudy` jumlah `Coudy` menjadi yang terbanyak hampir mendekati 2000 data
-2. pada `Clear` semua nilainya diisi dengan tipe `Sunny`
-3. pada `overccast` nilia terendahnya adda pada `Sunny` dan yang terbanyak adalah `Rainy` dan `Snowy`
-4. pada `cludy`, hampr semua datanya rata
-
-- Pada fitur `Season`
-
-  1. pada `winter` jumlah `Snowy` menjadi yang paling besar melebihi 3000 data, sedangkan yang lain ada di bawah 1000 data
-  2. pada `Spring`, `Summer` dan `Autumn` datanya hampir rata antara 500 - 1000 data kecuali pada data `Snowy` yang jumlahnya sangat sedikit
-
-- Pada fitur `Location`
-  1. pada `inland` dan `mountain` jumlah datanya hampir sama dengan data tertinggi ada pada `Snowy`
-  2. Sedangkan pada `coastal`, data `Snowy` menjdai yang terendah dengan jumlah kurang dari 200 data
-
-#### Numerical Features
-
-Menampilkan hubungan antar fitur numerik dengan target `Weather Type`
-
-```
-sns.pairplot(cuaca, hue='Weather Type')
-plt.show()
-```
-
-output:
-
-![multi numerical](https://github.com/user-attachments/assets/ae924be0-0161-4275-a87b-ef70d05fba11)
-
-Berdasarkan visualisasi data diatas, tidak terlihat adanya hubungan yang signifikan antara fitur dengan target `Weather Type`
 
 ## Data Preparation
 
