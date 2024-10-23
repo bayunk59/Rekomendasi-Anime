@@ -235,91 +235,54 @@ Data kini telah siap untuk dimasukkan ke dalam pemodelan dengan jumlah 9.892 bar
 
 ## Modeling
 
-Pada tahap ini, saya akan mengembangkan model machine learning dengan tiga algoritma. Kemudian, saya akan mengevaluasi performa masing-masing algoritma dan menentukan algoritma mana yang memberikan hasil prediksi terbaik. Ketiga algoritma yang akan saya gunakan, antara lain:
+Pada tahap ini, saya akan mengembangkan sistem rekomendasi dengan pendekatan content based filtering. sistem rekomendasi berbasis konten (content-based filtering) adalah merekomendasikan item yang mirip dengan item yang disukai pengguna di masa lalu dalam kasus ini merekomendasikan anime berdasarkan item `genre` yang sama. 
 
-1. K-Nearest Neighbor
-   - Kelebihan:
-     - Sederhana dan mudah diimplementasikan: Tidak memerlukan asumsi distribusi data.
-     - Non-parametrik: Tidak membuat asumsi tentang bentuk distribusi data.
-     - Fleksibel: Dapat digunakan untuk klasifikasi dan regresi.
-   - Kekurangan:
-     - Lambat pada data besar: Perhitungan jarak untuk semua data memerlukan banyak waktu.
-     - Sensitif terhadap skala fitur: Performa bisa terganggu jika skala fitur tidak dinormalisasi.
-     - Rentan terhadap outlier: Outlier dapat mempengaruhi prediksi.
-2. Random Forest
-   - Kelebihan:
-     - Akurasi tinggi: Menghasilkan model yang kuat melalui penggabungan banyak pohon keputusan.
-     - Resisten terhadap overfitting: Karena menggunakan banyak pohon, cenderung tidak overfit.
-     - Dapat menangani data yang hilang dan fitur penting: Mampu menangani data yang tidak lengkap.
-   - Kekurangan:
-     - Kurang interpretatif: Sulit untuk menafsirkan hasil model karena kompleksitas pohon yang dihasilkan.
-     - Lambat dalam prediksi: Meskipun cepat dalam pelatihan, bisa lambat saat melakukan prediksi pada dataset besar.
-     -
-3. Boosting Algorithm
-   - Kelebihan:
-     - Akurasi sangat tinggi: Memperbaiki kesalahan dari model sebelumnya sehingga cenderung menghasilkan prediksi yang lebih akurat.
-     - Bagus untuk data tidak seimbang: Dapat bekerja dengan baik pada data yang memiliki distribusi kelas yang tidak seimbang.
-     - Mengurangi bias: Fokus pada kesalahan model sebelumnya mengurangi bias model.
-   - Kekurangan:
-     - Lebih rentan terhadap overfitting: Jika tidak diatur dengan baik, dapat menghasilkan model yang terlalu fit terhadap data pelatihan.
-     - Waktu pelatihan yang lama: Karena model dilatih secara berurutan, pelatihan bisa memakan waktu lebih lama.
-     - Memerlukan tuning parameter: Hyperparameter harus diatur dengan cermat untuk performa yang optimal.
+Content-based filtering sendiri mempelajari profil minat pengguna baru berdasarkan data dari objek yang telah dinilai pengguna. Algoritma ini bekerja dengan menyarankan item serupa yang pernah disukai di masa lalu atau sedang dilihat di masa kini kepada pengguna. Semakin banyak informasi yang diberikan pengguna, semakin baik akurasi sistem rekomendasi.
 
-Tahap ini hanya digunakan untuk melatih data training dan menyimpan data testing dari semua model untuk tahap evaluasi yang akan dibahas di Modul Evaluasi Model
+![ilustrasi](https://github.com/user-attachments/assets/93eda825-47b6-47be-b039-4471052dc334)
 
-### Model K-Nearest Neighbor (KNN)
+Untuk membuat profil pengguna, dua informasi ini penting bagi sistem dengan pendekatan content-based filtering yaitu model preferensi pengguna dan riwayat interaksi pengguna dengan sistem rekomendasi. 
 
-KNN adalah algoritma yang relatif sederhana dibandingkan dengan algoritma lain. Algoritma KNN menggunakan ‘kesamaan fitur’ untuk memprediksi nilai dari setiap data yang baru. Dengan kata lain, setiap data baru diberi nilai berdasarkan seberapa mirip titik tersebut dalam set pelatihan.
-
-KNN bekerja dengan membandingkan jarak satu sampel ke sampel pelatihan lain dengan memilih sejumlah k tetangga terdekat (dengan k adalah sebuah angka positif). Nah, itulah mengapa algoritma ini dinamakan K-nearest neighbor (sejumlah k tetangga terdekat). KNN bisa digunakan untuk kasus klasifikasi dan regresi. Pada modul ini, kita akan menggunakannya untuk kasus regresi.
+pada proyek ini, kita akan menggunakan fungsi tfidfvectorizer() dari library sklearn dengan kode berikut
 
 ```
-knn = KNeighborsClassifier(n_neighbors=10)
-knn.fit(X_train, y_train)
-knn_predictions = knn.predict(X_test)
+# Inisialisasi TfidfVectorizer
+tf = TfidfVectorizer()
+
+# Melakukan perhitungan idf pada data genre
+tf.fit(df_new['genre'])
+
+# Mapping array dari fitur index integer ke fitur name
+tf.get_feature_names_out()
 ```
 
-pada tahapan ini kita akan melatih data dengan KNN, kita menggunakan `n_neighbors`= 10 tetangga dan metric Euclidean untuk mengukur jarak antara titik.
-
-### Model Random Forest
-
-Algoritma random forest adalah salah satu algoritma supervised learning. Ia dapat digunakan untuk menyelesaikan masalah klasifikasi dan regresi. Random forest juga merupakan algoritma yang sering digunakan karena cukup sederhana tetapi memiliki stabilitas yang mumpuni.
-
-Random forest merupakan salah satu model machine learning yang termasuk ke dalam kategori ensemble (group) learning. Apa itu model ensemble? Sederhananya, ia merupakan model prediksi yang terdiri dari beberapa model dan bekerja secara bersama-sama.
+output:
 
 ```
-RF = RandomForestClassifier(n_estimators=50, max_depth=16, random_state=55, n_jobs=-1)
-RF.fit(X_train, y_train)
-RF_predictions = RF.predict(X_test)
+array(['action', 'adventure', 'ai', 'arts', 'cars', 'comedy', 'dementia',
+       'demons', 'drama', 'ecchi', 'fantasy', 'fi', 'game', 'harem',
+       'hentai', 'historical', 'horror', 'josei', 'kids', 'life', 'magic',
+       'martial', 'mecha', 'military', 'music', 'mystery', 'of', 'parody',
+       'police', 'power', 'psychological', 'romance', 'samurai', 'school',
+       'sci', 'seinen', 'shoujo', 'shounen', 'slice', 'space', 'sports',
+       'super', 'supernatural', 'thriller', 'vampire', 'yaoi', 'yuri'],
+      dtype=object)
 ```
 
-Berikut adalah parameter-parameter yang digunakan:
-
-- `n_estimator`: jumlah trees (pohon) di forest. Di sini nilai set `n_estimator`=50.
-- `max_depth`: ukuran seberapa banyak pohon dapat membelah (splitting) untuk membagi setiap node ke dalam jumlah pengamatan yang diinginkan. Di sini nilai set `max_depth`=16.
-- `random_state`: digunakan untuk mengontrol random number generator yang digunakan. Di sini nilai set `random_state`=55.
-- `n_jobs`: komponen untuk mengontrol thread atau proses yang berjalan secara paralel. Di sini nilai set `n_job`s=-1 artinya semua proses berjalan secara paralel.
-
-### Model Boosting Algorithm
-
-Teknik boosting, model dilatih secara berurutan atau dalam proses yang iteratif. Algoritma yang menggunakan teknik boosting bekerja dengan membangun model dari data latih. Kemudian ia membuat model kedua yang bertugas memperbaiki kesalahan dari model pertama. Model ditambahkan sampai data latih terprediksi dengan baik atau telah mencapai jumlah maksimum model untuk ditambahkan.
-
-Dilihat dari caranya memperbaiki kesalahan pada model sebelumnya, algoritma boosting terdiri dari dua metode:
-
-1.  Adaptive boosting
-2.  Gradient boosting
-    Pada modul ini, kita akan menggunakan metode adaptive boosting. Salah satu metode adaptive boosting yang terkenal adalah AdaBoost, dikenalkan oleh Freund and Schapire (1995)
+Selanjutnya, kita lakukan fit dan transformasi ke dalam bentuk matriks. 
 
 ```
-boosting = AdaBoostClassifier(learning_rate=0.05, random_state=55)
-boosting.fit(X_train, y_train)
-boosting_predictions = boosting.predict(X_test)
+# Melakukan fit lalu ditransformasikan ke bentuk matrix
+tfidf_matrix = tf.fit_transform(df_new['genre'])
+
+# Melihat ukuran matrix tfidf
+tfidf_matrix.shape
 ```
 
-Berikut merupakan parameter-parameter yang digunakan pada potongan kode di atas.
+menghasilkan matriks dengan ukuran (9882, 47). Nilai 9882 merupakan ukuran data dan 47 adalah merupakan matriks dari genre.
 
-- `learning_rate`: bobot yang diterapkan pada setiap regressor di masing-masing proses iterasi boosting.
-- `random_state`: digunakan untuk mengontrol random number generator yang digunakan.
+
+
 
 ## Evaluation
 
