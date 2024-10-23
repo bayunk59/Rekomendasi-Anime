@@ -19,26 +19,26 @@ Berdasarkan data yang diambil dari kaggle mengenai database anime, terdapat bebe
 Problem statements yang ingin dibahas adalah:
 
 1. Berdasarkan dataset yang digunakan, bagaimana membuat sistem rekomendasi yang dipersonalisasikan dengan teknik content-based filtering?
-2. Dengan data rating yang Anda miliki, bagaimana perusahaan dapat merekomendasikan restoran lain yang mungkin disukai dan belum pernah dikunjungi oleh pengguna?
+2. Berdasarkan dataset yang digunakan, 5 rekomendasi apa yang paling sesuai berdasarkan genre yang sama?
 
 ### Goals
 
 Goals/tujuan dari poyek ini adalah:
 
 1. Menghasilkan sejumlah rekomendasi restoran yang dipersonalisasi untuk pengguna dengan teknik content-based filtering.
-2. Menghasilkan sejumlah rekomendasi restoran yang sesuai dengan preferensi pengguna dan belum pernah dikunjungi sebelumnya dengan teknik collaborative filtering.
+2. Menghasilkan 5 rekomendasi anime yang sesuai dengan genre yang pernah dikunjungi sebelumnya menggunakan teknik content-based filtering.
 
 ### Solution statements
 
 Beberapa solusi yang akan coba terapkan adalah:
 
 1. Melakukan eksplorasi fitur seperti cek duplikasi data, cek missing variabel di tiap data
-2. Untuk mendapatkan data yang bersih sebelum di buat permodelan. Dilakukan preparation data yang terdiri dari Menghapus missing value, Menghapus rating user yang bernilai -1, Encoding Fitur Kategori, Train-Test-Spit dan Standarisasi.
-3. Permodelan akan dilakukan dengan 2 metode yaitu.
+2. Untuk mendapatkan data yang bersih sebelum di buat permodelan. Dilakukan preparation data yang terdiri dari Menghapus missing value, Menghapus rating user yang bernilai -1, menggabungkan data `anime` dan `ratings`, mengatasi duplicate data fitur `name`, membuat dictionary pada fitur `anime_id`, `name` dan `genre`.
+3. Permodelan akan dilakukan dengan metode Content Based Filtering untuk menghasilkan 5 rekomendasi berdasakan genre yang sama.
 
 ## Data Understanding
 
-Data yang saya gunakan berasal dari Kaggle dengan judul Weather Type Classification [cuaca](https://www.kaggle.com/datasets/nikhil7280/weather-type-classification), Data tersebut berisi 13200 data dan 11 kolom dengan 7 data numerik dan 4 data katgorik. Berikut adalah detail masing-masing kolomnya:
+Data yang saya gunakan berasal dari Kaggle dengan judul Anime Recommendations Database [anime](https://www.kaggle.com/datasets/CooperUnion/anime-recommendations-database), Data tersebut berisi 2 file dengan . Berikut adalah detail masing-masing kolomnya:
 
 ### Variabel-variabel pada dataset adalah sebagai berikut:
 
