@@ -39,53 +39,58 @@ Beberapa solusi yang akan coba terapkan adalah:
 ## Data Understanding
 
 Data yang saya gunakan berasal dari Kaggle dengan judul Anime Recommendations Database [anime](https://www.kaggle.com/datasets/CooperUnion/anime-recommendations-database), Data tersebut berisi 2 file dengan rincian sebagai berikut
+
 1. file `anime`
-  - `anime_id`: Id unik untuk judul anime
-  - `name`: Nama anime
-  - `genre`: Genre anime
-  - `type`: Tipe seperti Movie, TV, OVA, dll
-  - `episodes`: Jumlah episode
-  - `rating`: rating untuk anime
-  - `members`: jumlah anggota komunitas anime tersebut
+
+- `anime_id`: Id unik untuk judul anime
+- `name`: Nama anime
+- `genre`: Genre anime
+- `type`: Tipe seperti Movie, TV, OVA, dll
+- `episodes`: Jumlah episode
+- `rating`: rating untuk anime
+- `members`: jumlah anggota komunitas anime tersebut
 
 2. file `rating`
-  - `user_id`: Id user.
-  - `anime_id`: id anime.
-  - `rating`: Rating dari user (jika bernilai -1 berarti user hanya menonton dan tidak memberi rating).
+
+- `user_id`: Id user.
+- `anime_id`: id anime.
+- `rating`: Rating dari user (jika bernilai -1 berarti user hanya menonton dan tidak memberi rating).
 
 Tahapan yang akan saya lakukan pada variabel `anime` adalah sebagai berikut:
 
 1. Membuat dataset bernama `anime`, lalu menampilkannya
 
-| anime_id | name                          | genre                                               | type | episodes | rating | members  |
-|----------|-------------------------------|-----------------------------------------------------|------|----------|--------|----------|
-| 32281    | Kimi no Na wa.                | Drama, Romance, School, Supernatural                | Movie| 1        | 9.37   | 200630   |
-| 5114     | Fullmetal Alchemist: Brotherhood | Action, Adventure, Drama, Fantasy, Magic, Military | TV   | 64       | 9.26   | 793665   |
-| 28977    | Gintama°                      | Action, Comedy, Historical, Parody, Samurai, Sci-Fi| TV   | 51       | 9.25   | 114262   |
-| 9253     | Steins;Gate                   | Sci-Fi, Thriller                                    | TV   | 24       | 9.17   | 673572   |
-| 9969     | Gintama'                      | Action, Comedy, Historical, Parody, Samurai, Sci-Fi| TV   | 51       | 9.16   | 151266   |
+| anime_id | name                             | genre                                               | type  | episodes | rating | members |
+| -------- | -------------------------------- | --------------------------------------------------- | ----- | -------- | ------ | ------- |
+| 32281    | Kimi no Na wa.                   | Drama, Romance, School, Supernatural                | Movie | 1        | 9.37   | 200630  |
+| 5114     | Fullmetal Alchemist: Brotherhood | Action, Adventure, Drama, Fantasy, Magic, Military  | TV    | 64       | 9.26   | 793665  |
+| 28977    | Gintama°                         | Action, Comedy, Historical, Parody, Samurai, Sci-Fi | TV    | 51       | 9.25   | 114262  |
+| 9253     | Steins;Gate                      | Sci-Fi, Thriller                                    | TV    | 24       | 9.17   | 673572  |
+| 9969     | Gintama'                         | Action, Comedy, Historical, Parody, Samurai, Sci-Fi | TV    | 51       | 9.16   | 151266  |
 
 2. cek data `anime`
 
-| Column     | Non-Null Count | Dtype   |
-|------------|----------------|---------|
-| anime_id   | 12,294         | int64   |
-| name       | 12,294         | object  |
-| genre      | 12,232         | object  |
-| type       | 12,269         | object  |
-| episodes   | 12,294         | object  |
-| rating     | 12,064         | float64 |
-| members    | 12,294         | int64   |
+| Column   | Non-Null Count | Dtype   |
+| -------- | -------------- | ------- |
+| anime_id | 12,294         | int64   |
+| name     | 12,294         | object  |
+| genre    | 12,232         | object  |
+| type     | 12,269         | object  |
+| episodes | 12,294         | object  |
+| rating   | 12,064         | float64 |
+| members  | 12,294         | int64   |
 
 berdasarkan data tersebut terdapat 12.294 baris dengan 7 kolom.
 
 3. Cek jumlah genre dan apa saja genrenya
+
 ```
 print('Banyak genre anime: ', len(anime.genre.unique()))
 print('genre: ', anime.genre.unique())
 ```
 
 ouput:
+
 ```
 Banyak genre anime:  3265
 genre:  ['Drama, Romance, School, Supernatural'
@@ -95,16 +100,17 @@ genre:  ['Drama, Romance, School, Supernatural'
 ```
 
 4. Terahir cek missing value, berdasarkan hasil pengecekan missing value terdapat beberapa data yang memiliki missing value dengan rincian sebagai berikut:
-  - `genre`: 62 data
-  - `type`: 25 data
-  - `rating`: 230 data
+
+- `genre`: 62 data
+- `type`: 25 data
+- `rating`: 230 data
 
 Selanjutnya, tahapan yang akan saya lakukan pada variabel `rating` adalah sebagai berikut:
 
 1. Membuat dataset bernama `ratings`, lalu menampilkannya
 
 | user_id | anime_id | rating |
-|---------|----------|--------|
+| ------- | -------- | ------ |
 | 1       | 20       | -1     |
 | 1       | 24       | -1     |
 | 1       | 79       | -1     |
@@ -113,17 +119,18 @@ Selanjutnya, tahapan yang akan saya lakukan pada variabel `rating` adalah sebaga
 
 2. cek data `ratings`
 
-| Column    | Dtype   |
-|-----------|---------|
-| user_id   | int64   |
-| anime_id  | int64   |
-| rating    | int64   |
+| Column   | Dtype |
+| -------- | ----- |
+| user_id  | int64 |
+| anime_id | int64 |
+| rating   | int64 |
 
 berdasarkan data tersebut terdapat 7.813.737 baris dengan 3 kolom.
 
 3. cek missing value, berdasarkan hasil pengecekan missing value tidak terdapat data yang memiliki missing value
 
 4. cek jumlah pada fitur `rating` yang memiliki nilai -1
+
 ```
 ratings[ratings.rating == -1].shape
 ```
@@ -137,6 +144,7 @@ Data preparation merupakan tahapan penting dalam proses pengembangan model machi
 ### Menghapus missing value
 
 Setelah di cek, hanya beberapa fitur yang memiliki missing value seperti fitur `genre`, `type` dan `rating`. Langsung saja kita hapus 3 fitur tersebut
+
 ```
 anime.dropna(subset=['genre', 'type', 'rating'], inplace=True)
 ```
@@ -146,6 +154,7 @@ Missing value telah berhasil di hapus.
 ### Menghapus rating yang bernilai -1
 
 Nilai -1 pada fitur `rating` tidak akan berpengaruh karena tidak menggambarkan apapun, nilai -1 ini akan dihapuskan saja.
+
 ```
 ratings = ratings[ratings.rating != -1]
 ```
@@ -162,22 +171,24 @@ df = pd.merge(anime, ratings, on='anime_id', how='inner')
 
 lalu tampilkan data gabungan dengan nama `df`
 
-| anime_id | name           | genre                                 | type  | episodes | rating_x | members | user_id | rating_y |
-|----------|----------------|---------------------------------------|-------|----------|----------|---------|---------|----------|
-| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 99      | 5        |
-| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 152     | 10       |
-| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 244     | 10       |
-| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 271     | 10       |
-| 32281    | Kimi no Na wa.  | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 322     | 10       |
+| anime_id | name           | genre                                | type  | episodes | rating_x | members | user_id | rating_y |
+| -------- | -------------- | ------------------------------------ | ----- | -------- | -------- | ------- | ------- | -------- |
+| 32281    | Kimi no Na wa. | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 99      | 5        |
+| 32281    | Kimi no Na wa. | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 152     | 10       |
+| 32281    | Kimi no Na wa. | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 244     | 10       |
+| 32281    | Kimi no Na wa. | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 271     | 10       |
+| 32281    | Kimi no Na wa. | Drama, Romance, School, Supernatural | Movie | 1        | 9.37     | 200630  | 322     | 10       |
 
 berdasarkan data yang telah digabung, jumlah data menjadi 6.337.146 baris dengan 9 kolom. ada 2 fitur yang memiliki nama yang sama dan diubah menjadi:
+
 - `rating_x`: berasal dari fitur `rating` di variabel `anime` berisi nilai rating keseluruhan
 - `rating_y`: berasal dari fitur `rating` di variabel `ratings` berisi nilai rating yang diberikan user
 
 ### Mengatasi duplicate data pada fitur `name`
 
-Cek data duplicate pada fitur `name` agar tidak ada nama anime yang sama, setelahnya hapus data yang sama. 
+Cek data duplicate pada fitur `name` agar tidak ada nama anime yang sama, setelahnya hapus data yang sama.
 Setelah duplicate data dihapus, lalu kita masukkan ke dalam data baru bernama `preparation`
+
 ```
 preparation = df.drop_duplicates('name')
 ```
@@ -187,6 +198,7 @@ Setelah berhasil dihapus, jumlah baris `preparation` menjadi 9892 baris saja.
 ### Membuat dictionary pada fitur `anime_id`, `name`, dan `genre`
 
 Selanjutnya, kita perlu melakukan konversi data series menjadi list. Dalam hal ini, kita menggunakan fungsi tolist() dari library numpy.
+
 ```
 anime_id = preparation['anime_id'].tolist()
 name = preparation['name'].tolist()
@@ -194,6 +206,7 @@ genre = preparation['genre'].tolist()
 ```
 
 Tahap berikutnya, kita akan membuat dictionary untuk menentukan pasangan key-value pada data anime_id, name, dan genre yang telah kita siapkan sebelumnya dan dimasukkan dalam dataset baru bernama `df_new`.
+
 ```
 df_new = pd.DataFrame({
     'anime_id': anime_id,
@@ -205,21 +218,20 @@ df_new
 
 output:
 
-| anime_id | name                                   | genre                                              |
-|----------|----------------------------------------|----------------------------------------------------|
-| 32281    | Kimi no Na wa.                         | Drama, Romance, School, Supernatural               |
-| 5114     | Fullmetal Alchemist: Brotherhood        | Action, Adventure, Drama, Fantasy, Magic, Military |
-| 28977    | Gintama°                               | Action, Comedy, Historical, Parody, Samurai, Sci-Fi|
-| 9253     | Steins;Gate                            | Sci-Fi, Thriller                                   |
-| 9969     | Gintama'                               | Action, Comedy, Historical, Parody, Samurai, Sci-Fi|
-| 5541     | The Satisfaction                       | Hentai                                             |
-| 9316     | Toushindai My Lover: Minami tai Mecha-Minami | Hentai                                          |
-| 5543     | Under World                            | Hentai                                             |
-| 5621     | Violence Gekiga David no Hoshi         | Hentai                                             |
-| 6133     | Violence Gekiga Shin David no Hoshi: Inma Densetsu | Hentai                                         |
+| anime_id | name                                               | genre                                               |
+| -------- | -------------------------------------------------- | --------------------------------------------------- |
+| 32281    | Kimi no Na wa.                                     | Drama, Romance, School, Supernatural                |
+| 5114     | Fullmetal Alchemist: Brotherhood                   | Action, Adventure, Drama, Fantasy, Magic, Military  |
+| 28977    | Gintama°                                           | Action, Comedy, Historical, Parody, Samurai, Sci-Fi |
+| 9253     | Steins;Gate                                        | Sci-Fi, Thriller                                    |
+| 9969     | Gintama'                                           | Action, Comedy, Historical, Parody, Samurai, Sci-Fi |
+| 5541     | The Satisfaction                                   | Hentai                                              |
+| 9316     | Toushindai My Lover: Minami tai Mecha-Minami       | Hentai                                              |
+| 5543     | Under World                                        | Hentai                                              |
+| 5621     | Violence Gekiga David no Hoshi                     | Hentai                                              |
+| 6133     | Violence Gekiga Shin David no Hoshi: Inma Densetsu | Hentai                                              |
 
 Data kini telah siap untuk dimasukkan ke dalam pemodelan dengan jumlah 9.892 baris dan 3 kolom.
-
 
 ## Modeling
 
