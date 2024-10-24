@@ -33,7 +33,7 @@ Goals/tujuan dari poyek ini adalah:
 Beberapa solusi yang akan coba terapkan adalah:
 
 1. Melakukan eksplorasi fitur seperti cek duplikasi data, cek missing variabel di tiap data
-2. Untuk mendapatkan data yang bersih sebelum di buat permodelan. Dilakukan preparation data yang terdiri dari Menghapus missing value, Menghapus rating user yang bernilai -1, menggabungkan data `anime` dan `ratings`, mengatasi duplicate data fitur `name`, membuat dictionary pada fitur `anime_id`, `name` dan `genre`.
+2. Untuk mendapatkan data yang bersih sebelum di buat permodelan. Dilakukan preparation data yang terdiri dari Menghapus missing value, Menghapus rating user yang bernilai -1, menggabungkan data `anime` dan `ratings`, mengatasi duplicate data fitur `name`, membuat dictionary pada fitur `anime_id`, `name` dan `genre` dan yang terakhir kita akan merepresentasikan fitur genre menggunakan fungsi TF-IDF Vectorizer.
 3. Permodelan akan dilakukan dengan metode Content Based Filtering untuk menghasilkan 5 rekomendasi berdasakan genre yang sama.
 
 ## Data Understanding
@@ -42,19 +42,19 @@ Data yang saya gunakan berasal dari Kaggle dengan judul Anime Recommendations Da
 
 1. file `anime` terdiri dari 12.294 baris dengan 7 kolom dengan rincian sebagai berikut:
 
-- `anime_id`: Id unik untuk judul anime
-- `name`: Nama anime
-- `genre`: Genre anime
-- `type`: Tipe seperti Movie, TV, OVA, dll
-- `episodes`: Jumlah episode
-- `rating`: rating untuk anime
-- `members`: jumlah anggota komunitas anime tersebut
+- `anime_id`: Id unik untuk judul anime (numerik)
+- `name`: Nama anime (kategorik)
+- `genre`: Genre anime (kategorik)
+- `type`: Tipe seperti Movie, TV, OVA, dll (kategorik)
+- `episodes`: Jumlah episode (numerik)
+- `rating`: rating untuk anime (numerik)
+- `members`: jumlah anggota komunitas anime tersebut (numerik)
 
 2. file `rating` terdiri dari 7.813.737 baris dengan 3 kolom dengan rincian sebagai berikut:
 
-- `user_id`: Id user.
-- `anime_id`: id anime.
-- `rating`: Rating dari user (jika bernilai -1 berarti user hanya menonton dan tidak memberi rating).
+- `user_id`: Id user. (numerik)
+- `anime_id`: id anime. (numerik)
+- `rating`: Rating dari user (jika bernilai -1 berarti user hanya menonton dan tidak memberi rating). (numerik)
 
 Tahapan yang akan saya lakukan pada variabel `anime` adalah sebagai berikut:
 
@@ -233,31 +233,9 @@ output:
 
 Data kini telah siap untuk dimasukkan ke dalam pemodelan dengan jumlah 9.892 baris dan 3 kolom.
 
-## Modeling
+### TF-IDF Vectorizer
 
-Pada tahap ini, saya akan mengembangkan sistem rekomendasi dengan pendekatan content based filtering. sistem rekomendasi berbasis konten (content-based filtering) adalah merekomendasikan item yang mirip dengan item yang disukai pengguna di masa lalu dalam kasus ini merekomendasikan anime berdasarkan item `genre` yang sama. 
-
-Content-based filtering sendiri mempelajari profil minat pengguna baru berdasarkan data dari objek yang telah dinilai pengguna. Algoritma ini bekerja dengan menyarankan item serupa yang pernah disukai di masa lalu atau sedang dilihat di masa kini kepada pengguna. Semakin banyak informasi yang diberikan pengguna, semakin baik akurasi sistem rekomendasi.
-
-![ilustrasi](https://github.com/user-attachments/assets/93eda825-47b6-47be-b039-4471052dc334)
-
-Untuk membuat profil pengguna, dua informasi ini penting bagi sistem dengan pendekatan content-based filtering yaitu model preferensi pengguna dan riwayat interaksi pengguna dengan sistem rekomendasi. 
-
-pada proyek ini, kita akan menggunakan fungsi tfidfvectorizer() dari library sklearn dengan kode berikut
-
-```
-# Inisialisasi TfidfVectorizer
-tf = TfidfVectorizer()
-
-# Melakukan perhitungan idf pada data genre
-tf.fit(df_new['genre'])
-
-# Mapping array dari fitur index integer ke fitur name
-tf.get_feature_names_out()
-```
-
-output:
-
+Satu tahapan lagi sebelum permodelan, kita akan menggunakan fungsi tfidfvectorizer() dari library sklearn untuk merepresentasikan fitur-fitur penting dalam penentuan rekomendasi. pertama kita akan mapping array dari fitur index integer ke fitur nama dan menghasilkan array sebagai berikut:
 ```
 array(['action', 'adventure', 'ai', 'arts', 'cars', 'comedy', 'dementia',
        'demons', 'drama', 'ecchi', 'fantasy', 'fi', 'game', 'harem',
@@ -269,47 +247,28 @@ array(['action', 'adventure', 'ai', 'arts', 'cars', 'comedy', 'dementia',
       dtype=object)
 ```
 
-Selanjutnya, kita lakukan fit dan transformasi ke dalam bentuk matriks. 
-
-```
-# Melakukan fit lalu ditransformasikan ke bentuk matrix
-tfidf_matrix = tf.fit_transform(df_new['genre'])
-
-# Melihat ukuran matrix tfidf
-tfidf_matrix.shape
-```
-
-menghasilkan matriks dengan ukuran (9882, 47). Nilai 9882 merupakan ukuran data dan 47 adalah merupakan matriks dari genre.
+Selanjutnya, kita lakukan fit dan transformasi ke dalam bentuk matriks. hasil fit dan transformasi menghasilkan matriks dengan ukuran (9882, 47). Nilai 9882 merupakan ukuran data dan 47 adalah merupakan matriks dari genre.
 Kemudiaan kita akan menghasilkan vektor tf-idf dalam bentuk matriks, kita juga akan menggunakan fungsi todense() untuk melihat matriks tf-idf untuk beberapa judul anime `name` dan `genre` nya. Terakhir kita akan menghitung derajat kesamaan antara satu judul anime dengan judul lainnya untuk menghasilkan kandidat judul `name` yang akan direkomendasikan.
-Pada tahapan ini, fungsi yang akan kita gunakan adalan fungsi cosine_similarity dari library sklearn. 
 
-```
-from sklearn.metrics.pairwise import cosine_similarity
- 
-# Menghitung cosine similarity pada matrix tf-idf
-cosine_sim = cosine_similarity(tfidf_matrix) 
-cosine_sim
-```
 
-Selanjutnya, kita akan lihat matriks kesamaan setiap anime dengan menampilkan nama anime dalam 5 sampel kolom (axis = 1) dan 10 sampel baris (axis=0). Jalankan kode berikut. 
+## Modeling
 
-```
-# Membuat dataframe dari variabel cosine_sim dengan baris dan kolom berupa nama anime
-cosine_sim_df = pd.DataFrame(cosine_sim, index=data['name'], columns=data['name'])
-print('Shape:', cosine_sim_df.shape)
- 
-# Melihat similarity matrix pada setiap anime
-cosine_sim_df.sample(5, axis=1).sample(10, axis=0)
-```
+Pada tahap ini, saya akan mengembangkan sistem rekomendasi dengan pendekatan content based filtering. sistem rekomendasi berbasis konten (content-based filtering) adalah merekomendasikan item yang mirip dengan item yang disukai pengguna di masa lalu dalam kasus ini merekomendasikan anime berdasarkan item `genre` yang sama. 
 
-Dengan cosine similarity, kita berhasil mengidentifikasi kesamaan antara satu `name` dengan `name` lainnya. Shape (9892, 9892) merupakan ukuran matriks similarity dari data yang kita miliki. Berdasarkan data yang ada, matriks di atas sebenarnya berukuran 9892 `name` x 9892 `name` (masing-masing dalam sumbu X dan Y). Artinya, kita mengidentifikasi tingkat kesamaan pada 9892 judul `name`. 
+Content-based filtering sendiri mempelajari profil minat pengguna baru berdasarkan data dari objek yang telah dinilai pengguna. Algoritma ini bekerja dengan menyarankan item serupa yang pernah disukai di masa lalu atau sedang dilihat di masa kini kepada pengguna. Semakin banyak informasi yang diberikan pengguna, semakin baik akurasi sistem rekomendasi.
+
+![ilustrasi](https://github.com/user-attachments/assets/93eda825-47b6-47be-b039-4471052dc334)
+
+Untuk membuat profil pengguna, dua informasi ini penting bagi sistem dengan pendekatan content-based filtering yaitu model preferensi pengguna dan riwayat interaksi pengguna dengan sistem rekomendasi. 
+
+
+Pada tahapan ini, fungsi yang akan kita gunakan adalan fungsi cosine_similarity dari library sklearn untuk melihat matriks kesamaan setiap anime dengan menampilkan nama anime. Dengan cosine similarity, kita berhasil mengidentifikasi kesamaan antara satu `name` dengan `name` lainnya. Shape (9892, 9892) merupakan ukuran matriks similarity dari data yang kita miliki. Berdasarkan data yang ada, matriks di atas sebenarnya berukuran 9892 `name` x 9892 `name` (masing-masing dalam sumbu X dan Y). Artinya, kita mengidentifikasi tingkat kesamaan pada 9892 judul `name`. 
 
 Selanjutnya kita akan menguji model kita dengan membuat `fungsi_recommendations` dengan beberapa parameter sebagai berikut:
 - Nama_anime : Nama anime (index kemiripan dataframe).
 - Similarity_data : Dataframe mengenai similarity yang telah kita definisikan sebelumnya.
 - Items : Nama dan fitur yang digunakan untuk mendefinisikan kemiripan, dalam hal ini adalah `name` dan `genre`.
 - k : Banyak rekomendasi yang ingin diberikan (dalam hal ini saya  menampilkan 5 rekomendasi).
-
 
 ```
 def anime_recommendations(nama_anime, similarity_data=cosine_sim_df, items=df_new[['name', 'genre']], k=5):
@@ -378,4 +337,4 @@ print(Precision)
 output:
 `1.0`
 
-Berdasrkan hasil evaluasi di atas menggunakan metrik `precision` didapatkan nilai 1, ini menandakan semua rekomendasi yang ditampilkan sesuai atau relevan dengan genre anime yang pernah di tonton sebelumnya. Berdasarkan nilai tersebut juga membuktikan bahwa sistem memiliki kemampuan yang sangat baik dalam menyeleksi dan merekomendasikan item yang tepat untuk pengguna.
+Berdasarkan hasil evaluasi di atas menggunakan metrik `precision` didapatkan nilai 1, ini menandakan semua rekomendasi yang ditampilkan sesuai atau relevan dengan genre anime yang pernah di tonton sebelumnya. Berdasarkan nilai tersebut juga membuktikan bahwa sistem memiliki kemampuan yang sangat baik dalam menyeleksi dan merekomendasikan item yang tepat untuk pengguna.
