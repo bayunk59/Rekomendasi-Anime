@@ -359,12 +359,17 @@ Berdasarkan dari 5 rekomendasi yang ditampilkan, semuanya memiliki genre yang pe
 
 ## Evaluation
 
-Pada proses evaluasi kita akan menggunakan metrik `Precision`. metrik `Precision` adalah proporsi prediksi positif yang benar terhadap seluruh prediksi positif yang dibuat oleh model.
+Pada proses evaluasi kita akan menggunakan metrik `Precision`. `precision` adalah metrik evaluasi yang mengukur seberapa relevan item yang direkomendasikan dibandingkan dengan semua item yang benar-benar direkomendasikan. secara rumus bisa dituliskan sebagai berikut:
 
-![precision](https://github.com/user-attachments/assets/d4ef8767-3c82-43a0-9341-7925f7ead6ce)
+![preci](https://github.com/user-attachments/assets/115f0b3f-86a7-4935-9ff5-bc2c5caa641a)
 
-- Digunakan saat kita ingin meminimalkan False Positive. Misalnya, dalam diagnosa penyakit, kita ingin memastikan bahwa hasil positif memang benar-benar positif (tidak ada kesalahan positif palsu).
-- Cocok digunakan ketika kesalahan positif palsu sangat mahal atau berbahaya.
+Precision menilai kualitas rekomendasi, yaitu seberapa besar proporsi dari item yang direkomendasikan adalah benar-benar relevan bagi pengguna. Metrik ini penting ketika ingin memastikan bahwa sebagian besar rekomendasi yang diterima pengguna memang sesuai dengan minat atau kebutuhan mereka. Precision sangat berguna ketika jumlah rekomendasi yang diberikan cukup terbatas, dan kualitas lebih penting daripada kuantitas.
+
+
+
+
+
+ 
 
 
 Berdasarkan hasil visualisasi dan nilai data diatas, terlihat bahwa model `K-Nearest Neighbors` memiliki nilai `Accuracy` dengan nilai 92,13%, `Precision` dengan nilai 92,12%, `Recall` dengan nilai 92,13%, dan `F1 Score` dengan nilai 92,10%. Pada model `Random Forest` memiliki `Accuracy` dengan nilai 94,78%, `Precision` dengan nilai 94,8%, `Recall` dengan nilai 94,78%, dan `F1 Score` dengan nilai 94,76%, sedangkan Pada model `Boosting Algorithm` memiliki `Accuracy` dengan nilai 91,27%, `Precision` dengan nilai 82,86%, `Recall` dengan nilai 81,27%, dan `F1 Score` dengan nilai 80,95%. Berdasarkan data tersebut, `Random Forest` menjadi model dengan nilai terbaik.
