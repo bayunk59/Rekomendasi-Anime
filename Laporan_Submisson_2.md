@@ -280,109 +280,92 @@ tfidf_matrix.shape
 ```
 
 menghasilkan matriks dengan ukuran (9882, 47). Nilai 9882 merupakan ukuran data dan 47 adalah merupakan matriks dari genre.
+Kemudiaan kita akan menghasilkan vektor tf-idf dalam bentuk matriks, kita juga akan menggunakan fungsi todense() untuk melihat matriks tf-idf untuk beberapa judul anime `name` dan `genre` nya. Terakhir kita akan menghitung derajat kesamaan antara satu judul anime dengan judul lainnya untuk menghasilkan kandidat judul `name` yang akan direkomendasikan.
+Pada tahapan ini, fungsi yang akan kita gunakan adalan fungsi cosine_similarity dari library sklearn. 
+
+```
+from sklearn.metrics.pairwise import cosine_similarity
+ 
+# Menghitung cosine similarity pada matrix tf-idf
+cosine_sim = cosine_similarity(tfidf_matrix) 
+cosine_sim
+```
+
+Selanjutnya, kita akan lihat matriks kesamaan setiap resto dengan menampilkan nama restoran dalam 5 sampel kolom (axis = 1) dan 10 sampel baris (axis=0). Jalankan kode berikut. 
+
+```
+# Membuat dataframe dari variabel cosine_sim dengan baris dan kolom berupa nama resto
+cosine_sim_df = pd.DataFrame(cosine_sim, index=data['resto_name'], columns=data['resto_name'])
+print('Shape:', cosine_sim_df.shape)
+ 
+# Melihat similarity matrix pada setiap resto
+cosine_sim_df.sample(5, axis=1).sample(10, axis=0)
+```
+
+Dengan cosine similarity, kita berhasil mengidentifikasi kesamaan antara satu `name` dengan `name` lainnya. Shape (9892, 9892) merupakan ukuran matriks similarity dari data yang kita miliki. Berdasarkan data yang ada, matriks di atas sebenarnya berukuran 9892 `name` x 9892 `name` (masing-masing dalam sumbu X dan Y). Artinya, kita mengidentifikasi tingkat kesamaan pada 9892 judul `name`. 
+
+Selanjutnya kita akan menguji model kita dengan membuat `fungsi_recommendations` dengan beberapa parameter sebagai berikut:
+- Nama_anime : Nama anime (index kemiripan dataframe).
+- Similarity_data : Dataframe mengenai similarity yang telah kita definisikan sebelumnya.
+- Items : Nama dan fitur yang digunakan untuk mendefinisikan kemiripan, dalam hal ini adalah `name` dan `genre`.
+- k : Banyak rekomendasi yang ingin diberikan (dalam hal ini saya  menampilkan 5 rekomendasi).
 
 
+```
+def anime_recommendations(nama_anime, similarity_data=cosine_sim_df, items=df_new[['name', 'genre']], k=5):
+    index = similarity_data.loc[:,nama_anime].to_numpy().argpartition(
+        range(-1, -k, -1))
 
+    # Mengambil data dengan similarity terbesar dari index yang ada
+    closest = similarity_data.columns[index[-1:-(k+2):-1]]
+
+    # Drop nama_anime agar nama anime yang dicari tidak muncul dalam daftar rekomendasi
+    closest = closest.drop(nama_anime, errors='ignore')
+
+    return pd.DataFrame(closest).merge(items).head(k)
+```
+
+Selanjutnya, kita akan terapkan kode di atas untuk menemukan rekomendasi anime yang mirip dengan `Detective Conan OVA 11: A Secret Order from London`. Terapkan kode berikut:
+
+```
+df_new[df_new.name.eq('Detective Conan OVA 11: A Secret Order from London')]
+```
+output:
+
+|       | anime_id | name                                            | genre                                      |
+|-------|----------|-------------------------------------------------|--------------------------------------------|
+| 1493  | 10703    | Detective Conan OVA 11: A Secret Order from Lo...| Adventure, Comedy, Mystery, Police, Shounen|
+
+Anime dengan judul `Detective Conan OVA 11: A Secret Order from London` memliki genre `Adventure, Comedy, Mystery, Police, Shounen`. Sekarang kita akan mencoba mendapatkan rekomendasi dengan genre yang sama menggunakan kode berikut:
+
+```
+# Menampilkan 5 rekomendasi
+anime_recommendations('Detective Conan OVA 11: A Secret Order from London')
+```
+
+output:
+
+| name                                                  | genre                                      |
+|-------------------------------------------------------|--------------------------------------------|
+| Detective Conan OVA 03: Conan and Heiji and the...     | Adventure, Comedy, Mystery, Police, Shounen|
+| Detective Conan Movie 01: The Timed Skyscraper         | Adventure, Comedy, Mystery, Police, Shounen|
+| Aoyama Goushou Tanpenshuu                             | Adventure, Comedy, Mystery, Police, Shounen|
+| Detective Conan Movie 04: Captured in Her Eyes        | Adventure, Comedy, Mystery, Police, Shounen|
+| Detective Conan: Black History 2                      | Adventure, Comedy, Mystery, Police, Shounen|
+
+
+Berdasarkan dari 5 rekomendasi yang ditampilkan, semuanya memiliki genre yang persi sama dengan
+`Detective Conan OVA 11: A Secret Order from London` dengan genre `Adventure, Comedy, Mystery, Police, Shounen`.
 
 ## Evaluation
 
-Pada proses evaluasi kita akan menggunakan metrik `Accuracy`, `Precision`, `Recall` dan `F1-Score` untuk menentukan peforma mana yang terbaik. berikut penjelasannya,
-
-1. `Accuracy` adalah roporsi dari prediksi yang benar terhadap total jumlah data. Ini adalah metrik paling sederhana untuk mengevaluasi model klasifikasi.
-
-   ![accuracy](https://github.com/user-attachments/assets/1aaffaa4-8dde-4285-9712-e6ec6c13ddc3)
-
-- True Positive (TP): Prediksi positif yang benar.
-- True Negative (TN): Prediksi negatif yang benar.
-- False Positive (FP): Prediksi positif yang salah (kesalahan tipe I).
-- False Negative (FN): Prediksi negatif yang salah (kesalahan tipe II).
-
-Akurasi bagus jika data seimbang, tetapi jika data tidak seimbang (misalnya lebih banyak kelas negatif daripada kelas positif), akurasi bisa menyesatkan.
-
-3. `Precision` adalah proporsi prediksi positif yang benar terhadap seluruh prediksi positif yang dibuat oleh model.
+Pada proses evaluasi kita akan menggunakan metrik `Precision`. metrik `Precision` adalah proporsi prediksi positif yang benar terhadap seluruh prediksi positif yang dibuat oleh model.
 
 ![precision](https://github.com/user-attachments/assets/d4ef8767-3c82-43a0-9341-7925f7ead6ce)
 
 - Digunakan saat kita ingin meminimalkan False Positive. Misalnya, dalam diagnosa penyakit, kita ingin memastikan bahwa hasil positif memang benar-benar positif (tidak ada kesalahan positif palsu).
 - Cocok digunakan ketika kesalahan positif palsu sangat mahal atau berbahaya.
 
-3. `Recall` adalah proporsi dari prediksi positif yang benar terhadap seluruh sampel yang benar-benar positif.
-
-   ![Recall](https://github.com/user-attachments/assets/c934fc3a-3779-4855-bedb-cdc5b954d49c)
-
--Recall penting ketika kita ingin meminimalkan False Negative. Misalnya, dalam skrining penyakit berbahaya seperti kanker, kita ingin mengidentifikasi sebanyak mungkin kasus positif, sehingga recall harus tinggi.
-
-- Cocok digunakan ketika kesalahan negatif palsu lebih kritis.
-
-4. `F1-Score` adalah harmonic mean dari Precision dan Recall. Ini adalah metrik yang baik ketika ada ketidakseimbangan antara Precision dan Recall. F1-Score memberikan nilai keseimbangan antara keduanya.
-
-   ![F1](https://github.com/user-attachments/assets/41a89953-7989-4318-b88e-56698bd8b1c6)
-
-- `F1-Score` berguna jika kita memiliki dataset yang tidak seimbang, di mana kita ingin menjaga keseimbangan antara Precision dan Recall.
-- F1 lebih rendah jika salah satu dari Precision atau Recall rendah, karena ini merupakan rata-rata harmonik yang lebih memperhatikan nilai yang rendah dibandingkan rata-rata biasa.
-
-Selanjutnya adalah evaluasi ketiga model
-
-```
-evaluasi = pd.DataFrame(columns=['train', 'test'], index = ['KNN', 'RF', 'Boosting'])
-
-model_dict = {'KNN': knn, 'RF': RF, 'Boosting': boosting}
-
-for name, model in model_dict.items():
-    evaluasi.loc[name, 'train'] = metrics.accuracy_score(y_true=y_train, y_pred=model.predict(X_train))/1e3
-    evaluasi.loc[name, 'test'] = metrics.accuracy_score(y_true=y_test, y_pred=model.predict(X_test))/1e3
-```
-
-output:
-
-|          | Train  | Test   |
-| -------- | ------ | ------ |
-| KNN      | 94.12% | 92.13% |
-| RF       | 99.05% | 94.78% |
-| Boosting | 80.14% | 81.27% |
-
-selanjutnya kita akan melihat nilai `Accuracy`, `Precision`, `Recall` dan `F1-Score` pada ketiga model
-
-```
-# Calculate metrics for each model
-model_metrics = {model: calculate_metrics(y_true, predictions) for model, predictions in models.items()}
-
-# Print the metrics for each model
-for model, metrics in model_metrics.items():
-    print(f"Model: {model}")
-    for metric_name, metric_value in metrics.items():
-        print(f"{metric_name}: {metric_value:.4f}")
-    print("-" * 20)
-
-```
-
-hasilnya adalah
-
-```
-Model: KNN
-Accuracy: 0.9213
-Precision: 0.9212
-Recall: 0.9213
-F1 Score: 0.9210
---------------------
-Model: Random Forest
-Accuracy: 0.9478
-Precision: 0.9480
-Recall: 0.9478
-F1 Score: 0.9476
---------------------
-Model: Boosting
-Accuracy: 0.8127
-Precision: 0.8286
-Recall: 0.8127
-F1 Score: 0.8095
---------------------
-```
-
-Selanjutnya kita uji prediksinya menggunakan beberapa nilai dalam data dan mendapatkan hasil prediksi sebagai berikut
-| y_true | prediksi_KNN | prediksi_RF | prediksi_Boosting |
-|--------|--------------|-------------|-------------------|
-| Rainy | Snowy | Rainy | Snowy |
 
 Berdasarkan hasil visualisasi dan nilai data diatas, terlihat bahwa model `K-Nearest Neighbors` memiliki nilai `Accuracy` dengan nilai 92,13%, `Precision` dengan nilai 92,12%, `Recall` dengan nilai 92,13%, dan `F1 Score` dengan nilai 92,10%. Pada model `Random Forest` memiliki `Accuracy` dengan nilai 94,78%, `Precision` dengan nilai 94,8%, `Recall` dengan nilai 94,78%, dan `F1 Score` dengan nilai 94,76%, sedangkan Pada model `Boosting Algorithm` memiliki `Accuracy` dengan nilai 91,27%, `Precision` dengan nilai 82,86%, `Recall` dengan nilai 81,27%, dan `F1 Score` dengan nilai 80,95%. Berdasarkan data tersebut, `Random Forest` menjadi model dengan nilai terbaik.
 Selain itu, hasil prediksi `K-Nearest Neighbors` dan `Random Forest` menjadi yang paling mendekati nilai sebenarnya. Maka dari itu permodelan yang akan digunakan untuk mengklasifikasikan cuaca adalah model `Random Forest`, semoga dengan model ini bisa membantu menentukan klasifikasi cuaca yang terbaik sesuai data.
