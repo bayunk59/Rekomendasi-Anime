@@ -1,6 +1,6 @@
-# Rekomendasi-Anime
+# Laporan Proyek Machine Learning - Sistem Rekomendasi
 
-Proyek Sistem Rekomendasi Pertama
+Proyek Sistem Rekomendasi Anime
 
 ## Domain Proyek
 
@@ -25,7 +25,7 @@ Problem statements yang ingin dibahas adalah:
 
 Goals/tujuan dari poyek ini adalah:
 
-1. Menghasilkan sejumlah rekomendasi restoran yang dipersonalisasi untuk pengguna dengan teknik content-based filtering.
+1. Menghasilkan sejumlah rekomendasi anime yang dipersonalisasi untuk pengguna dengan teknik content-based filtering.
 2. Menghasilkan 5 rekomendasi anime yang sesuai dengan genre yang pernah dikunjungi sebelumnya menggunakan teknik content-based filtering.
 
 ### Solution statements
@@ -40,7 +40,7 @@ Beberapa solusi yang akan coba terapkan adalah:
 
 Data yang saya gunakan berasal dari Kaggle dengan judul Anime Recommendations Database [anime](https://www.kaggle.com/datasets/CooperUnion/anime-recommendations-database), Data tersebut berisi 2 file dengan rincian sebagai berikut
 
-1. file `anime`
+1. file `anime` terdiri dari 12.294 baris dengan 7 kolom dengan rincian sebagai berikut:
 
 - `anime_id`: Id unik untuk judul anime
 - `name`: Nama anime
@@ -50,7 +50,7 @@ Data yang saya gunakan berasal dari Kaggle dengan judul Anime Recommendations Da
 - `rating`: rating untuk anime
 - `members`: jumlah anggota komunitas anime tersebut
 
-2. file `rating`
+2. file `rating` terdiri dari 7.813.737 baris dengan 3 kolom dengan rincian sebagai berikut:
 
 - `user_id`: Id user.
 - `anime_id`: id anime.
@@ -58,7 +58,7 @@ Data yang saya gunakan berasal dari Kaggle dengan judul Anime Recommendations Da
 
 Tahapan yang akan saya lakukan pada variabel `anime` adalah sebagai berikut:
 
-1. Membuat dataset bernama `anime`, lalu menampilkannya
+1. menammpilkan dataset `anime`
 
 | anime_id | name                             | genre                                               | type  | episodes | rating | members |
 | -------- | -------------------------------- | --------------------------------------------------- | ----- | -------- | ------ | ------- |
@@ -107,7 +107,7 @@ genre:  ['Drama, Romance, School, Supernatural'
 
 Selanjutnya, tahapan yang akan saya lakukan pada variabel `rating` adalah sebagai berikut:
 
-1. Membuat dataset bernama `ratings`, lalu menampilkannya
+1. Menampilkan dataset `ratings`
 
 | user_id | anime_id | rating |
 | ------- | -------- | ------ |
@@ -291,14 +291,14 @@ cosine_sim = cosine_similarity(tfidf_matrix)
 cosine_sim
 ```
 
-Selanjutnya, kita akan lihat matriks kesamaan setiap resto dengan menampilkan nama restoran dalam 5 sampel kolom (axis = 1) dan 10 sampel baris (axis=0). Jalankan kode berikut. 
+Selanjutnya, kita akan lihat matriks kesamaan setiap anime dengan menampilkan nama anime dalam 5 sampel kolom (axis = 1) dan 10 sampel baris (axis=0). Jalankan kode berikut. 
 
 ```
-# Membuat dataframe dari variabel cosine_sim dengan baris dan kolom berupa nama resto
-cosine_sim_df = pd.DataFrame(cosine_sim, index=data['resto_name'], columns=data['resto_name'])
+# Membuat dataframe dari variabel cosine_sim dengan baris dan kolom berupa nama anime
+cosine_sim_df = pd.DataFrame(cosine_sim, index=data['name'], columns=data['name'])
 print('Shape:', cosine_sim_df.shape)
  
-# Melihat similarity matrix pada setiap resto
+# Melihat similarity matrix pada setiap anime
 cosine_sim_df.sample(5, axis=1).sample(10, axis=0)
 ```
 
