@@ -364,20 +364,18 @@ Pada proses evaluasi kita akan menggunakan metrik `Precision`. `precision` adala
 ![preci](https://github.com/user-attachments/assets/115f0b3f-86a7-4935-9ff5-bc2c5caa641a)
 
 Precision menilai kualitas rekomendasi, yaitu seberapa besar proporsi dari item yang direkomendasikan adalah benar-benar relevan bagi pengguna. Metrik ini penting ketika ingin memastikan bahwa sebagian besar rekomendasi yang diterima pengguna memang sesuai dengan minat atau kebutuhan mereka. Precision sangat berguna ketika jumlah rekomendasi yang diberikan cukup terbatas, dan kualitas lebih penting daripada kuantitas.
+Pada sistem rekomendasi ini, evaluasi akan dilakukan manual dengan kode sebaga berikut:
 
+```
+# Evaluasi model
+item_relevan = 5
+jumlah_rekomendasi = 5
 
+Precision = (item_relevan / jumlah_rekomendasi)
+print(Precision)
+```
 
+output:
+`1.0`
 
-
- 
-
-
-Berdasarkan hasil visualisasi dan nilai data diatas, terlihat bahwa model `K-Nearest Neighbors` memiliki nilai `Accuracy` dengan nilai 92,13%, `Precision` dengan nilai 92,12%, `Recall` dengan nilai 92,13%, dan `F1 Score` dengan nilai 92,10%. Pada model `Random Forest` memiliki `Accuracy` dengan nilai 94,78%, `Precision` dengan nilai 94,8%, `Recall` dengan nilai 94,78%, dan `F1 Score` dengan nilai 94,76%, sedangkan Pada model `Boosting Algorithm` memiliki `Accuracy` dengan nilai 91,27%, `Precision` dengan nilai 82,86%, `Recall` dengan nilai 81,27%, dan `F1 Score` dengan nilai 80,95%. Berdasarkan data tersebut, `Random Forest` menjadi model dengan nilai terbaik.
-Selain itu, hasil prediksi `K-Nearest Neighbors` dan `Random Forest` menjadi yang paling mendekati nilai sebenarnya. Maka dari itu permodelan yang akan digunakan untuk mengklasifikasikan cuaca adalah model `Random Forest`, semoga dengan model ini bisa membantu menentukan klasifikasi cuaca yang terbaik sesuai data.
-
-Untuk hubungan antara fitur dengan target, `UV Index` dan `Weather Type` memiliki nilai korelasi 0,41 menunjukkan adanya korelasi positif sedang antara kedua variabel tersebut. Korelasi positif berarti bahwa ketika `UV Index` meningkat, kemungkinan besar `Weather Type` juga akan berubah ke arah yang lebih tinggi.
-Dalam konteks ini, interpretasinya bisa berarti bahwa semakin tinggi nilai UV Index (yang biasanya menunjukkan sinar matahari yang lebih kuat), tipe cuaca cenderung bergerak ke arah cuaca yang lebih cerah atau lebih berpotensi terkena sinar matahari langsung. Ini masuk akal karena indeks UV biasanya lebih tinggi pada hari-hari cerah dan berkurang pada hari mendung atau hujan.
-Namun, karena nilai korelasinya 0,41, ini hanya menunjukkan korelasi sedang, yang berarti UV Index adalah salah satu dari beberapa faktor yang mempengaruhi Weather Type.
-
-Berbeda dengan `UV Index`, `Cloud Cover` memiliki nilai korelasi -0,57 antara `Cloud cover` (penutupan awan) dan `Weather Type` (tipe cuaca) menunjukkan bahwa terdapat korelasi negatif sedang antara kedua variabel tersebut. Korelasi negatif berarti bahwa ketika `Cloud cover` meningkat, kemungkinan besar `Weather Type` bergerak ke arah yang lebih rendah (atau berlawanan).
-Dalam hal ini, interpretasi sederhana bisa berarti bahwa semakin tinggi penutupan awan (cuaca mendung), kemungkinan besar tipe cuaca yang berkaitan dengan cerah atau matahari akan lebih kecil, sementara tipe cuaca yang lebih mendung, hujan, atau badai lebih mungkin terjadi.
+Berdasrkan hasil evaluasi di atas menggunakan metrik `precision` didapatkan nilai 1, ini menandakan semua rekomendasi yang ditampilkan sesuai atau relevan dengan genre anime yang pernah di tonton sebelumnya. Berdasarkan nilai tersebut juga membuktikan bahwa sistem memiliki kemampuan yang sangat baik dalam menyeleksi dan merekomendasikan item yang tepat untuk pengguna.
